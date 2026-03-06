@@ -4,8 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { BrandLogo } from "@/components/brand-logo";
+import { resolveProAccess } from "@/lib/pro-access";
 
-const PRO_ENABLED = process.env.NEXT_PUBLIC_PRO_ENABLED === "true";
+const { betaAllPro: BETA_ALL_PRO_ENABLED, hasProAccess: PRO_ENABLED } = resolveProAccess(
+  process.env.NEXT_PUBLIC_PRO_ENABLED === "true"
+);
 
 const NAV_LINKS: Array<{ href: string; label: string }> = [
   { href: "/", label: "Home" },
@@ -39,7 +42,7 @@ export function SiteNav({ className }: { className?: string }) {
             <BrandLogo variant="full" />
           </Link>
           <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-800">
-            Beta
+            {BETA_ALL_PRO_ENABLED ? "Beta: Pro unlocked" : "Beta"}
           </span>
         </div>
 
@@ -60,7 +63,11 @@ export function SiteNav({ className }: { className?: string }) {
               PRO_ENABLED ? "bg-emerald-100 text-emerald-800" : "bg-slate-900 text-white"
             }`}
           >
-            {PRO_ENABLED ? "Pro Enabled" : "Pro Available"}
+            {BETA_ALL_PRO_ENABLED
+              ? "Pro Unlocked"
+              : PRO_ENABLED
+                ? "Pro Enabled"
+                : "Pro Available"}
           </span>
         </div>
       </div>

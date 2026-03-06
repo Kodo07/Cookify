@@ -16,6 +16,7 @@ import { DetailModeToggle } from "@/components/detail-mode-toggle";
 import { TimerPanel } from "@/components/timer-panel";
 import { ToastStack } from "@/components/toast-stack";
 import { useCookingTimers } from "@/hooks/use-cooking-timers";
+import { resolveProAccess } from "@/lib/pro-access";
 import { useStoredRecipe } from "@/hooks/use-stored-recipe";
 import { parseServingsCount, scaleIngredients } from "@/lib/serving-scale";
 import { normalizeSteps } from "@/lib/step-normalizer";
@@ -25,7 +26,9 @@ import {
 } from "@/lib/step-tools";
 import type { DetailLevel } from "@/lib/types";
 
-const PRO_ENABLED = process.env.NEXT_PUBLIC_PRO_ENABLED === "true";
+const { hasProAccess: PRO_ENABLED } = resolveProAccess(
+  process.env.NEXT_PUBLIC_PRO_ENABLED === "true"
+);
 
 interface WakeLockSentinelLike {
   release: () => Promise<void>;

@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { simplifyStepsWithAi } from "@/lib/ai/hf";
+import { resolveProAccess } from "@/lib/pro-access";
 import type { DetailLevel } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+const { hasProAccess: PRO_ACCESS_ENABLED } = resolveProAccess(
+  process.env.NEXT_PUBLIC_PRO_ENABLED === "true"
+);
 
 interface SimplifyStepsRequestBody {
   steps?: unknown;
@@ -29,6 +33,10 @@ function parseSteps(input: unknown): string[] {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!PRO_ACCESS_ENABLED) {
+      return NextResponse.json({ error: "Pro access required." }, { status: 402 });
+    }
+
     const body = (await request.json()) as SimplifyStepsRequestBody;
     const steps = parseSteps(body.steps);
     const mode = parseMode(body.mode);

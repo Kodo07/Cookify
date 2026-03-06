@@ -6,8 +6,11 @@ import { useEffect, useMemo, useState } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { UpgradeModal } from "@/components/upgrade-modal";
 import { MEAL_PLANNER_KEY, getSavedRecipesFromLocalStorage } from "@/lib/local-library";
+import { resolveProAccess } from "@/lib/pro-access";
 
-const PRO_ENABLED = process.env.NEXT_PUBLIC_PRO_ENABLED === "true";
+const { betaAllPro: BETA_ALL_PRO_ENABLED, hasProAccess: PRO_ENABLED } = resolveProAccess(
+  process.env.NEXT_PUBLIC_PRO_ENABLED === "true"
+);
 const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 type PlannerStore = Record<string, string[]>;
@@ -275,11 +278,13 @@ export default function PlannerPage() {
 
   return (
     <main className="soft-grid min-h-screen bg-canvas bg-hero-radial px-4 py-8 sm:px-6">
-      <UpgradeModal
-        open={showUpgradeModal}
-        feature="Meal Planner + Combined Shopping List"
-        onClose={() => setShowUpgradeModal(false)}
-      />
+      {!BETA_ALL_PRO_ENABLED ? (
+        <UpgradeModal
+          open={showUpgradeModal}
+          feature="Meal Planner + Combined Shopping List"
+          onClose={() => setShowUpgradeModal(false)}
+        />
+      ) : null}
 
       <div className="mx-auto max-w-6xl space-y-6">
         <SiteNav />

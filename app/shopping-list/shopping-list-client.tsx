@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { UpgradeModal } from "@/components/upgrade-modal";
 import { getSavedRecipesFromLocalStorage } from "@/lib/local-library";
+import { resolveProAccess } from "@/lib/pro-access";
 import {
   GROCERY_CATEGORIES,
   GROCERY_CATEGORY_LABELS,
@@ -17,7 +18,9 @@ import {
   type GroceryCategory
 } from "@/lib/shopping-list";
 
-const PRO_ENABLED = process.env.NEXT_PUBLIC_PRO_ENABLED === "true";
+const { betaAllPro: BETA_ALL_PRO_ENABLED, hasProAccess: PRO_ENABLED } = resolveProAccess(
+  process.env.NEXT_PUBLIC_PRO_ENABLED === "true"
+);
 
 interface LocalRecipeSummary {
   id: string;
@@ -129,11 +132,13 @@ export default function ShoppingListClient() {
 
   return (
     <main className="soft-grid min-h-screen bg-canvas bg-hero-radial px-4 py-8 sm:px-6">
-      <UpgradeModal
-        open={showUpgradeModal}
-        feature="Smart Grocery List"
-        onClose={() => setShowUpgradeModal(false)}
-      />
+      {!BETA_ALL_PRO_ENABLED ? (
+        <UpgradeModal
+          open={showUpgradeModal}
+          feature="Smart Grocery List"
+          onClose={() => setShowUpgradeModal(false)}
+        />
+      ) : null}
 
       <div className="mx-auto max-w-6xl space-y-6">
         <SiteNav />

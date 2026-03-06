@@ -8,6 +8,7 @@ import { BrandLogo } from "@/components/brand-logo";
 import { QuickFactsBar } from "@/components/quick-facts-bar";
 import { UpgradeModal } from "@/components/upgrade-modal";
 import { useAiStatus } from "@/hooks/use-ai-status";
+import { resolveProAccess } from "@/lib/pro-access";
 import { useStoredRecipe } from "@/hooks/use-stored-recipe";
 import { normalizeSteps } from "@/lib/step-normalizer";
 import { extractPrepTasks } from "@/lib/step-tools";
@@ -17,7 +18,9 @@ interface PrepTasksResponse {
   error?: string;
 }
 
-const PRO_ENABLED = process.env.NEXT_PUBLIC_PRO_ENABLED === "true";
+const { betaAllPro: BETA_ALL_PRO_ENABLED, hasProAccess: PRO_ENABLED } = resolveProAccess(
+  process.env.NEXT_PUBLIC_PRO_ENABLED === "true"
+);
 
 function PrepSkeleton() {
   return (
@@ -186,11 +189,13 @@ export default function PrepModePage() {
 
   return (
     <main className="min-h-screen bg-canvas px-4 py-6 sm:px-6">
-      <UpgradeModal
-        open={showUpgradeModal}
-        feature="AI Prep List"
-        onClose={() => setShowUpgradeModal(false)}
-      />
+      {!BETA_ALL_PRO_ENABLED ? (
+        <UpgradeModal
+          open={showUpgradeModal}
+          feature="AI Prep List"
+          onClose={() => setShowUpgradeModal(false)}
+        />
+      ) : null}
 
       <div className="mx-auto max-w-5xl space-y-6">
         <header className="card p-6">

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { buildAiCacheKey, getCachedValue, setCachedValue } from "@/lib/ai/cache";
 import { generateIngredientSubstitutionsWithAi, isAiConfigured } from "@/lib/ai/hf";
 import { checkTokenBucket, getClientIpFromHeaders } from "@/lib/ai/rate-limit";
+import { resolveProAccess } from "@/lib/pro-access";
 import { generateHeuristicSubstitutions } from "@/lib/substitution-heuristics";
 
 export const runtime = "nodejs";
@@ -11,6 +12,9 @@ export const dynamic = "force-dynamic";
 const CACHE_TTL_MS = 3 * 24 * 60 * 60 * 1000;
 const RATE_CAPACITY = 20;
 const RATE_REFILL_PER_SECOND = RATE_CAPACITY / (60 * 60);
+const { hasProAccess: PRO_ACCESS_ENABLED } = resolveProAccess(
+  process.env.NEXT_PUBLIC_PRO_ENABLED === "true"
+);
 
 interface SubstituteBody {
   ingredient?: unknown;
@@ -45,6 +49,10 @@ function parseAllergies(input: unknown): string[] {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!PRO_ACCESS_ENABLED) {
+      return NextResponse.json({ error: "Pro access required." }, { status: 402 });
+    }
+
     const body = (await request.json()) as SubstituteBody;
     const ingredient = parseIngredient(body.ingredient);
     const diet = parseDiet(body.diet);

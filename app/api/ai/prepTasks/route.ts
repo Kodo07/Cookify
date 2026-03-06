@@ -4,6 +4,7 @@ import { buildAiCacheKey, getCachedValue, setCachedValue } from "@/lib/ai/cache"
 import { generatePrepTasksWithAi } from "@/lib/ai/hf";
 import { isAiConfigured } from "@/lib/ai/hf";
 import { checkTokenBucket, getClientIpFromHeaders } from "@/lib/ai/rate-limit";
+import { resolveProAccess } from "@/lib/pro-access";
 import { extractPrepTasks } from "@/lib/step-tools";
 import { normalizeSteps } from "@/lib/step-normalizer";
 
@@ -13,6 +14,9 @@ export const dynamic = "force-dynamic";
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const RATE_CAPACITY = 15;
 const RATE_REFILL_PER_SECOND = RATE_CAPACITY / (60 * 60);
+const { hasProAccess: PRO_ACCESS_ENABLED } = resolveProAccess(
+  process.env.NEXT_PUBLIC_PRO_ENABLED === "true"
+);
 
 interface PrepTasksRequestBody {
   title?: unknown;
@@ -38,6 +42,10 @@ function parseStringArray(input: unknown, max = 120): string[] {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!PRO_ACCESS_ENABLED) {
+      return NextResponse.json({ error: "Pro access required." }, { status: 402 });
+    }
+
     if (!isAiConfigured()) {
       return NextResponse.json(
         { error: "AI not configured. Set HF_TOKEN on the server." },

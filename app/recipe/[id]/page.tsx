@@ -20,6 +20,7 @@ import { useAiStatus } from "@/hooks/use-ai-status";
 import { useCookingTimers, type TimerToast } from "@/hooks/use-cooking-timers";
 import { useStoredRecipe } from "@/hooks/use-stored-recipe";
 import { isRecipeSavedLocally, markRecipeSavedLocally } from "@/lib/local-library";
+import { resolveProAccess } from "@/lib/pro-access";
 import { parseServingsCount, scaleIngredients } from "@/lib/serving-scale";
 import { normalizeSteps } from "@/lib/step-normalizer";
 import {
@@ -42,7 +43,9 @@ interface SubstituteResponse {
   fallback?: boolean;
 }
 
-const PRO_ENABLED = process.env.NEXT_PUBLIC_PRO_ENABLED === "true";
+const { betaAllPro: BETA_ALL_PRO_ENABLED, hasProAccess: PRO_ENABLED } = resolveProAccess(
+  process.env.NEXT_PUBLIC_PRO_ENABLED === "true"
+);
 
 function RecipeSkeleton() {
   return (
@@ -546,11 +549,13 @@ export default function RecipePage() {
   return (
     <main className="min-h-screen bg-canvas bg-hero-radial px-4 py-6 sm:px-6">
       <ToastStack toasts={allToasts} onDismiss={dismissAnyToast} />
-      <UpgradeModal
-        open={showUpgradeModal}
-        feature={upgradeFeature}
-        onClose={() => setShowUpgradeModal(false)}
-      />
+      {!BETA_ALL_PRO_ENABLED ? (
+        <UpgradeModal
+          open={showUpgradeModal}
+          feature={upgradeFeature}
+          onClose={() => setShowUpgradeModal(false)}
+        />
+      ) : null}
 
       <div className="mx-auto max-w-6xl space-y-6">
         <header className="card border-white/90 p-5 sm:p-6">

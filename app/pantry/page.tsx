@@ -8,6 +8,7 @@ import { UpgradeModal } from "@/components/upgrade-modal";
 import { useAiStatus } from "@/hooks/use-ai-status";
 import { parseIngredientInput } from "@/lib/ingredient-normalize";
 import { markRecipeSavedLocally } from "@/lib/local-library";
+import { resolveProAccess } from "@/lib/pro-access";
 import { createRecipeId, recipeStorageKey } from "@/lib/storage";
 import type { ParsedRecipe } from "@/lib/types";
 
@@ -23,7 +24,9 @@ interface GeneratedRecipeResponse {
   error?: string;
 }
 
-const PRO_ENABLED = process.env.NEXT_PUBLIC_PRO_ENABLED === "true";
+const { betaAllPro: BETA_ALL_PRO_ENABLED, hasProAccess: PRO_ENABLED } = resolveProAccess(
+  process.env.NEXT_PUBLIC_PRO_ENABLED === "true"
+);
 
 function parseApiRecipe(payload: GeneratedRecipeResponse): ParsedRecipe | null {
   if (
@@ -155,11 +158,13 @@ export default function PantryPage() {
 
   return (
     <main className="soft-grid min-h-screen bg-canvas bg-hero-radial px-4 py-8 sm:px-6">
-      <UpgradeModal
-        open={showUpgradeModal}
-        feature="AI Pantry Recipe Generator"
-        onClose={() => setShowUpgradeModal(false)}
-      />
+      {!BETA_ALL_PRO_ENABLED ? (
+        <UpgradeModal
+          open={showUpgradeModal}
+          feature="AI Pantry Recipe Generator"
+          onClose={() => setShowUpgradeModal(false)}
+        />
+      ) : null}
 
       <div className="mx-auto max-w-6xl space-y-6">
         <SiteNav />
