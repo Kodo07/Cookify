@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #f4f6f3;
+  color: #0f172a;
+  font-family: var(--font-manrope), sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-newsreader), serif;
+  letter-spacing: -0.02em;
+}
+
+.card {
+  @apply rounded-3xl border border-white/70 bg-white/85 shadow-soft backdrop-blur;
+}
+
+.soft-grid {
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.flashcard {
+  transform-style: preserve-3d;
+  transition:
+    transform 260ms ease,
+    box-shadow 260ms ease;
+}
+
+.flashcard:hover {
+  transform: translateY(-3px) rotateX(0.6deg);
+}
+
+.step-progress {
+  transition: width 220ms ease;
+}

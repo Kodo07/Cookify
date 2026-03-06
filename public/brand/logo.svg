@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 160" fill="none">
+  <text
+    x="12"
+    y="116"
+    font-family="Manrope, Avenir Next, system-ui, sans-serif"
+    font-size="112"
+    font-weight="700"
+    letter-spacing="-2"
+    fill="#1f2538"
+  >
+    cookify
+  </text>
+  <path
+    d="M325 47c18-14 39-18 53-14-2 15-11 36-31 46-14 7-31 7-42 3 4-13 10-24 20-35Z"
+    fill="#4f8d61"
+  />
+</svg>
